@@ -41,10 +41,12 @@ cell_left = openmoc.XPlane(x=-1.0/9.0, name='cell left')
 cell_right = openmoc.XPlane(x=1.0/9.0, name='cell right')
 cell_top = openmoc.YPlane(y=1.0/9.0, name='cell top')
 cell_bottom = openmoc.YPlane(y=-1.0/9.0, name='cell bottom')
+'''
 cell_left.setBoundaryType(openmoc.VACUUM)
 cell_right.setBoundaryType(openmoc.VACUUM)
 cell_top.setBoundaryType(openmoc.VACUUM)
 cell_bottom.setBoundaryType(openmoc.VACUUM)
+'''
 
 left.setBoundaryType(openmoc.VACUUM)
 right.setBoundaryType(openmoc.VACUUM)
@@ -88,10 +90,38 @@ root_universe = openmoc.Universe(name='root universe')
 root_universe.addCell(root_cell)
 
 fuel_univ = openmoc.Universe(name='fuel universe')
-mod_univ = openmoc.Universe(name='moderator universe')
 fuel_univ.addCell(fuel_cell)
+
+mod_univ = openmoc.Universe(name='moderator universe')
 mod_univ.addCell(moderator_cell)
 
+###############################################################################
+#                             Creating Lattice
+###############################################################################
+
+lattice = openmoc.Lattice(name='9x9 lattice')
+lattice.setWidth(width_x=2.0/9.0, width_y=2.0/9.0)
+
+# assign each lattice cell a universe ID
+lattice.setUniverses([[ \
+        [mod_univ, mod_univ, mod_univ, mod_univ, mod_univ,
+                mod_univ, mod_univ, mod_univ, mod_univ],
+        [mod_univ, mod_univ, mod_univ, mod_univ, mod_univ,
+                mod_univ, mod_univ, mod_univ, mod_univ],
+        [mod_univ, mod_univ, mod_univ, mod_univ, mod_univ,
+                mod_univ, mod_univ, mod_univ, mod_univ],
+        [mod_univ, mod_univ, mod_univ, fuel_univ, fuel_univ,
+                fuel_univ, mod_univ, mod_univ, mod_univ],
+        [mod_univ, mod_univ, mod_univ, fuel_univ, fuel_univ,
+                fuel_univ, mod_univ, mod_univ, mod_univ],
+        [mod_univ, mod_univ, mod_univ, fuel_univ, fuel_univ,
+                fuel_univ, mod_univ, mod_univ, mod_univ],
+        [mod_univ, mod_univ, mod_univ, mod_univ, mod_univ,
+                mod_univ, mod_univ, mod_univ, mod_univ],
+        [mod_univ, mod_univ, mod_univ, mod_univ, mod_univ,
+                mod_univ, mod_univ, mod_univ, mod_univ],
+        [mod_univ, mod_univ, mod_univ, mod_univ, mod_univ,
+                mod_univ, mod_univ, mod_univ, mod_univ]]])
 
 ###############################################################################
 #                         Creating the Geometry
@@ -112,6 +142,7 @@ openmoc.log.py_printf('NORMAL', 'Initializing the track generator...')
 
 track_generator = openmoc.TrackGenerator(geometry, num_azim, track_spacing)
 track_generator.setNumThreads(num_threads)
+openmoc.log.py_printf('NORMAL', 'Got here...')
 track_generator.generateTracks()
 
 
@@ -142,34 +173,5 @@ openmoc.plotter.plot_spatial_fluxes(solver, energy_groups=[1,2])
 openmoc.plotter.plot_energy_fluxes(solver, fsrs=range(geometry.getNumFSRs()))
 
 openmoc.log.py_printf('TITLE', 'Finished')
-
-###############################################################################
-#                             Creating Lattice
-###############################################################################
-
-lattice = openmoc.Lattice(name='9x9 lattice')
-lattice.setWidth(width_x=2.0/9.0, width_y=2.0/9.0)
-
-# assign each lattice cell a universe ID
-lattice.setUniverses([
-        [mod_univ, mod_univ, mod_univ, mod_univ, mod_univ,
-                mod_univ, mod_univ, mod_univ, mod_univ],
-        [mod_univ, mod_univ, mod_univ, mod_univ, mod_univ,
-                mod_univ, mod_univ, mod_univ, mod_univ],
-        [mod_univ, mod_univ, mod_univ, mod_univ, mod_univ,
-                mod_univ, mod_univ, mod_univ, mod_univ],
-        [mod_univ, mod_univ, mod_univ, fuel_univ, fuel_univ,
-                fuel_univ, mod_univ, mod_univ, mod_univ],
-        [mod_univ, mod_univ, mod_univ, fuel_univ, fuel_univ,
-                fuel_univ, mod_univ, mod_univ, mod_univ],
-        [mod_univ, mod_univ, mod_univ, fuel_univ, fuel_univ,
-                fuel_univ, mod_univ, mod_univ, mod_univ],
-        [mod_univ, mod_univ, mod_univ, mod_univ, mod_univ,
-                mod_univ, mod_univ, mod_univ, mod_univ],
-        [mod_univ, mod_univ, mod_univ, mod_univ, mod_univ,
-                mod_univ, mod_univ, mod_univ, mod_univ],
-        [mod_univ, mod_univ, mod_univ, mod_univ, mod_univ,
-                mod_univ, mod_univ, mod_univ, mod_univ]
-        ])
 
 root_cell.setFill(lattice)
